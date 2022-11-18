@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters } from "vuex";
 
 const ApartInfo = "ApartInfo";
 
@@ -43,9 +43,7 @@ export default {
     });
   },
 
-  methods: {
-    ...mapMutations(ApartInfo, ["SET_HOUSE_INFO"]),
-  },
+  methods: {},
 };
 </script>
 

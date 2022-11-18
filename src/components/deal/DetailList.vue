@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from "vuex";
+import { mapGetters } from "vuex";
 
 const ApartInfo = "ApartInfo";
 
@@ -24,9 +24,7 @@ export default {
   },
   mounted() {},
 
-  methods: {
-    ...mapMutations(ApartInfo, ["SET_HOUSE_DEAL"]),
-  },
+  methods: {},
 };
 </script>
 

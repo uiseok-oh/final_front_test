@@ -3,6 +3,7 @@ import Vuex from "vuex";
 // import axios from "axios";
 import MarkInfo from "@/store/modules/MarkInfo";
 import ApartInfo from "@/store/modules/ApartInfo";
+import AroundInfo from "@/store/modules/AroundInfo";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -16,5 +17,5 @@ export default new Vuex.Store({
   },
   mutations: {},
   actions: {},
-  modules: { MarkInfo, ApartInfo },
+  modules: { MarkInfo, ApartInfo, AroundInfo },
 });

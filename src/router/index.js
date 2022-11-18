@@ -1,8 +1,8 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-// import HomeView from "../views/HomeView.vue";
+import HomeView from "../views/HomeView.vue";
 // import DealMap from "@/components/deal/DealMap";
-import DealDetail from "@/components/deal/DealDetail";
+// import DealDetail from "@/components/deal/DealDetail";
 Vue.use(VueRouter);
 
 const routes = [
@@ -10,8 +10,8 @@ const routes = [
     path: "/",
     name: "home",
     // component: DealMap,
-    // component: HomeView,
-    component: DealDetail,
+    component: HomeView,
+    // component: DealDetail,
   },
   {
     path: "/about",
