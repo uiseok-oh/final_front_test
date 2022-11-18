@@ -1,15 +1,17 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 // import HomeView from "../views/HomeView.vue";
-import DealMap from "@/components/deal/DealMap";
+// import DealMap from "@/components/deal/DealMap";
+import DealDetail from "@/components/deal/DealDetail";
 Vue.use(VueRouter);
 
 const routes = [
   {
     path: "/",
     name: "home",
-    component: DealMap,
+    // component: DealMap,
     // component: HomeView,
+    component: DealDetail,
   },
   {
     path: "/about",
