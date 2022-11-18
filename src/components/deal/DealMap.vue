@@ -33,7 +33,25 @@
         @drag-end="rangeDrag"
       />
     </div>
-    <DealDetailVue v-if="modalView" />
+    <DealDetailVue class="overlab4" v-if="modalView" />
+    <b-form-input
+      v-model="keyword"
+      @keyup="searchFunc"
+      class="overlab5"
+      size="sm"
+      placeholder="검색"
+    ></b-form-input>
+    <b-list-group v-show="searchView" class="overlab6" id="placesList">
+      <b-list-group-item v-for="item in searchList" :key="item.id" @click="moveMap(item)" href="#">
+        <div style="display: flex">
+          <div style="width: 70%">{{ item.place_name }}</div>
+          <div style="width: 30%; font-size: 10pt; line-height: 10pt">
+            {{ item.category_group_name }}
+          </div>
+        </div>
+        <div style="font-size: 10pt">{{ item.address_name }}</div>
+      </b-list-group-item>
+    </b-list-group>
   </div>
 </template>
 
@@ -60,6 +78,9 @@ export default {
 
   data() {
     return {
+      searchList: [],
+      keyword: "",
+      searchView: false,
       rightLoc: { city: "", gu: "" },
       tabView: false,
       slideView: false,
@@ -118,12 +139,15 @@ export default {
         );
       this.tabView = true;
       this.modalView = false;
+      this.searchView = false;
       // console.log(mouseEvent.latLng);
       this.coordToLocationStore(mouseEvent.latLng);
     });
     kakao.maps.event.addListener(mapInstance, "click", () => {
       this.tabView = false;
       this.modalView = false;
+
+      this.searchView = false;
     });
 
     kakao.maps.event.addListener(mapInstance, "dragend", () => {
@@ -134,6 +158,8 @@ export default {
       this.SET_CUR_LOCY(latlng.getLng());
       this.tabView = false;
       this.modalView = false;
+
+      this.searchView = false;
       console.log(message);
     });
   },
@@ -325,7 +351,6 @@ export default {
 
         this.hospitalMarker.push(marker);
         this.hospitalMarker[i].setMap(this.map);
-        this.setMarkClickEvent(marker);
       }
     },
     createRestaurantMarkers() {
@@ -343,7 +368,6 @@ export default {
 
         this.restaurantMarker.push(marker);
         this.restaurantMarker[i].setMap(this.map);
-        this.setMarkClickEvent(marker);
       }
     },
     createSchoolMarkers() {
@@ -361,7 +385,6 @@ export default {
 
         this.schoolMarker.push(marker);
         this.schoolMarker[i].setMap(this.map);
-        this.setMarkClickEvent(marker);
       }
     },
     createStoreMarkers() {
@@ -379,7 +402,6 @@ export default {
 
         this.storeMarker.push(marker);
         this.storeMarker[i].setMap(this.map);
-        this.setMarkClickEvent(marker);
       }
     },
     createSubMarkers() {
@@ -397,7 +419,6 @@ export default {
 
         this.subMarker.push(marker);
         this.subMarker[i].setMap(this.map);
-        this.setMarkClickEvent(marker);
       }
     },
     ////////////////마커제거/////////////////
@@ -478,6 +499,30 @@ export default {
         this.modalView = true;
       });
     },
+    moveCenter(x, y) {
+      let kakao = window.kakao;
+      let moveLatLon = new kakao.maps.LatLng(x, y);
+      this.SET_CUR_LOCX(x);
+      this.SET_CUR_LOCY(y);
+      this.map.panTo(moveLatLon);
+    },
+    searchFunc(event) {
+      let kakao = window.kakao;
+      this.searchView = true;
+      console.log(event);
+      let ps = new kakao.maps.services.Places();
+      ps.keywordSearch(this.keyword, (places, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          this.searchList = places;
+          console.log(places);
+        }
+      });
+    },
+    moveMap(e) {
+      console.log(e.x);
+      console.log(e.y);
+      this.moveCenter(e.y, e.x);
+    },
   },
 };
 </script>
@@ -525,7 +570,7 @@ body {
 .overlab2 {
   position: absolute;
   width: 300px;
-  top: 40px;
+  top: 35px;
   left: 150px;
   z-index: 1;
   margin: 0;
@@ -540,5 +585,29 @@ body {
   margin: 0;
   padding: 0;
   background-color: white;
+}
+.overlab4 {
+}
+.overlab5 {
+  position: absolute;
+  width: 300px;
+  top: 60px;
+  left: 5px;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+}
+.overlab6 {
+  position: absolute;
+  width: 290px;
+  top: 100px;
+  left: 10px;
+  height: 300px;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  overflow-y: auto;
 }
 </style>
