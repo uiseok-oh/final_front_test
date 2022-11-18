@@ -38,7 +38,7 @@ export default {
     initMap() {
       const container = document.getElementById("map");
       const options = {
-        center: new kakao.maps.LatLng(33.450701, 126.570667),
+        center: new kakao.maps.LatLng(35.95, 128.25),
         level: 12,
       };
       this.map = new kakao.maps.Map(container, options);
@@ -129,7 +129,9 @@ export default {
         var coordinates2 = [];
 
         $.each(val2[0], function (index2, coordinate) {
-          coordinates2.push(new kakao.maps.LatLng(coordinate[1], coordinate[0]));
+          coordinates2.push(
+            new kakao.maps.LatLng(coordinate[1], coordinate[0])
+          );
         });
 
         polygonPath.push(coordinates2);

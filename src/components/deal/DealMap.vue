@@ -7,6 +7,7 @@
       id="checkbox-group-1"
       v-model="selected"
       name="location"
+      style="background: white; height: 15px; width: 210px"
     >
       <b-form-checkbox @click.native="setMapUpdate" value="hospital">병원</b-form-checkbox>
       <b-form-checkbox @click.native="setMapUpdate" value="restaurant">음식점</b-form-checkbox>
@@ -14,11 +15,17 @@
       <b-form-checkbox @click.native="setMapUpdate" value="mart">마트</b-form-checkbox>
       <b-form-checkbox @click.native="setMapUpdate" value="sub">지하철</b-form-checkbox>
     </b-form-checkbox-group>
-    <div id="rightTag" class="overlab">테스트</div>
-    <div class="overlab2">
+    <div class="overlab3">
+      <b-button pill variant="outline-secondary" @click="onOff" size="sm">매매 필터</b-button>
+    </div>
+    <div id="rightTag" class="overlab" v-show="tabView">
+      <b-button pill variant="danger" size="sm" @click="addAtt">내 관심지역 추가</b-button>
+    </div>
+    <div class="overlab2" style="background-color: white">
       <vue-slider
         id="range"
         v-model="value"
+        v-show="slideView"
         :order="false"
         :min="0"
         :max="10000"
@@ -26,10 +33,12 @@
         @drag-end="rangeDrag"
       />
     </div>
+    <DealDetailVue v-if="modalView" />
   </div>
 </template>
 
 <script>
+import DealDetailVue from "./DealDetail.vue";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/antd.css";
 import hospitalImg from "@/assets/images/hospital.png";
@@ -40,11 +49,21 @@ import subImage from "@/assets/images/subway.png";
 import { mapMutations, mapGetters } from "vuex";
 const MarkInfo = "MarkInfo";
 
+function searchDetailAddrFromCoords(coords, callback) {
+  let kakao = window.kakao;
+  let geocoder = new kakao.maps.services.Geocoder();
+  geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
+}
+
 export default {
   name: "DealMap",
 
   data() {
     return {
+      rightLoc: { city: "", gu: "" },
+      tabView: false,
+      slideView: false,
+      modalView: false,
       map: null, //mapInstance 저장값 가장 중요!!!
       selected: [],
       value: [0, 10000],
@@ -59,6 +78,7 @@ export default {
   },
   components: {
     VueSlider,
+    DealDetailVue,
   },
 
   computed: {
@@ -68,8 +88,7 @@ export default {
       "getLocSchoolInfo",
       "getLocStoreInfo",
       "getLocSubInfo",
-      "getLocAttLocX",
-      "getLocAttLocY",
+      "getLocAttLoc",
       "getLocCurLocX",
       "getLocCurLocY",
     ]),
@@ -90,13 +109,21 @@ export default {
     console.log(mapInstance);
     this.map = mapInstance;
 
-    kakao.maps.event.addListener(mapInstance, "rightclick", function (mouseEvent) {
+    kakao.maps.event.addListener(mapInstance, "rightclick", (mouseEvent) => {
       document
         .getElementById("rightTag")
         .setAttribute(
           "style",
-          `position: absolute; top: ${mouseEvent.point.y}px;left: ${mouseEvent.point.x}px;z-index: 1; visibility: visible;`
+          `position: absolute; top: ${mouseEvent.point.y}px;left: ${mouseEvent.point.x}px;z-index: 1; `
         );
+      this.tabView = true;
+      this.modalView = false;
+      // console.log(mouseEvent.latLng);
+      this.coordToLocationStore(mouseEvent.latLng);
+    });
+    kakao.maps.event.addListener(mapInstance, "click", () => {
+      this.tabView = false;
+      this.modalView = false;
     });
 
     kakao.maps.event.addListener(mapInstance, "dragend", () => {
@@ -105,6 +132,8 @@ export default {
       message += "경도는 " + latlng.getLng() + " 입니다";
       this.SET_CUR_LOCX(latlng.getLat());
       this.SET_CUR_LOCY(latlng.getLng());
+      this.tabView = false;
+      this.modalView = false;
       console.log(message);
     });
   },
@@ -121,8 +150,7 @@ export default {
       "SET_STORE_INIT",
       "SET_SUB_INFO",
       "SET_SUB_INIT",
-      "SET_ATT_LOCX",
-      "SET_ATT_LOCY",
+      "ADD_ATT_LOC",
       "SET_CUR_LOCX",
       "SET_CUR_LOCY",
     ]),
@@ -297,6 +325,7 @@ export default {
 
         this.hospitalMarker.push(marker);
         this.hospitalMarker[i].setMap(this.map);
+        this.setMarkClickEvent(marker);
       }
     },
     createRestaurantMarkers() {
@@ -314,6 +343,7 @@ export default {
 
         this.restaurantMarker.push(marker);
         this.restaurantMarker[i].setMap(this.map);
+        this.setMarkClickEvent(marker);
       }
     },
     createSchoolMarkers() {
@@ -331,6 +361,7 @@ export default {
 
         this.schoolMarker.push(marker);
         this.schoolMarker[i].setMap(this.map);
+        this.setMarkClickEvent(marker);
       }
     },
     createStoreMarkers() {
@@ -348,6 +379,7 @@ export default {
 
         this.storeMarker.push(marker);
         this.storeMarker[i].setMap(this.map);
+        this.setMarkClickEvent(marker);
       }
     },
     createSubMarkers() {
@@ -365,6 +397,7 @@ export default {
 
         this.subMarker.push(marker);
         this.subMarker[i].setMap(this.map);
+        this.setMarkClickEvent(marker);
       }
     },
     ////////////////마커제거/////////////////
@@ -418,6 +451,33 @@ export default {
 
       return marker;
     },
+    onOff() {
+      this.slideView = !this.slideView;
+    },
+
+    coordToLocationStore(latLng) {
+      let kakao = window.kakao;
+      searchDetailAddrFromCoords(latLng, (result, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+          console.log(result[0]);
+          this.rightLoc.city = result[0].address.region_1depth_name;
+          this.rightLoc.gu = result[0].address.region_2depth_name;
+        }
+      });
+    },
+    addAtt() {
+      let tmpObj = { city: this.rightLoc.city, gu: this.rightLoc.gu };
+      this.ADD_ATT_LOC(tmpObj);
+      this.tabView = false;
+      alert("관심지역이 추가되었습니다.");
+    },
+    setMarkClickEvent(marker) {
+      let kakao = window.kakao;
+      kakao.maps.event.addListener(marker, "click", (evt) => {
+        console.log(evt);
+        this.modalView = true;
+      });
+    },
   },
 };
 </script>
@@ -439,7 +499,7 @@ body {
 
 .custom_typecontrol {
   position: absolute;
-  top: 50px;
+  top: 5px;
   left: 10px;
   overflow: hidden;
   width: 300px;
@@ -460,16 +520,25 @@ body {
   top: 100px;
   left: 100px;
   z-index: 1;
-  visibility: hidden;
 }
 
 .overlab2 {
   position: absolute;
   width: 300px;
-  top: 50px;
-  left: 320px;
+  top: 40px;
+  left: 150px;
   z-index: 1;
   margin: 0;
   padding: 0;
+}
+.overlab3 {
+  position: absolute;
+  width: 80px;
+  top: 0px;
+  left: 250px;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  background-color: white;
 }
 </style>

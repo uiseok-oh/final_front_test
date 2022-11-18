@@ -1,8 +1,7 @@
 const MarkInfo = {
   namespaced: true,
   state: {
-    attLocX: 0.0,
-    attLocY: 0.0,
+    attLoc: [],
     curLocX: 0.0,
     curLocY: 0.0,
     hospitals: [],
@@ -27,11 +26,8 @@ const MarkInfo = {
     getLocSubInfo: function (state) {
       return state.subs;
     },
-    getLocAttLocX: function (state) {
-      return state.attLocX;
-    },
-    getLocAttLocY: function (state) {
-      return state.attLocY;
+    getLocAttLoc: function (state) {
+      return state.attLoc;
     },
     getLocCurLocX: function (state) {
       return state.curLocX;
@@ -71,11 +67,11 @@ const MarkInfo = {
     SET_SUB_INIT(state) {
       state.subs = null;
     },
-    SET_ATT_LOCX(state, x) {
-      state.attLocX = x;
+    ADD_ATT_LOC(state, item) {
+      state.attLoc.push(item);
     },
-    SET_ATT_LOCY(state, y) {
-      state.attLocY = y;
+    SUB_ATT_LOC(state, index) {
+      state.attLoc.splice(index, 1);
     },
     SET_CUR_LOCX(state, x) {
       state.curLocX = x;
