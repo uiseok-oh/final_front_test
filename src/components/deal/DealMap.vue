@@ -66,6 +66,7 @@ import storeImg from "@/assets/images/store.png";
 import subImage from "@/assets/images/subway.png";
 import { mapMutations, mapGetters } from "vuex";
 const MarkInfo = "MarkInfo";
+const optionNames = ["hospital", "restaurant", "school", "mart", "sub"];
 
 function searchDetailAddrFromCoords(coords, callback) {
   let kakao = window.kakao;
@@ -158,9 +159,9 @@ export default {
       this.SET_CUR_LOCY(latlng.getLng());
       this.tabView = false;
       this.modalView = false;
-
       this.searchView = false;
       console.log(message);
+      this.allOptionCheck();
     });
   },
 
@@ -182,6 +183,62 @@ export default {
     ]),
 
     ///////////////////////다양한 옵션 설정///////////////////////
+    allOptionCheck() {
+      for (let i = 0; i < optionNames.length; i++) {
+        console.log(optionNames[i]);
+        console.log(this.selected.includes(optionNames[i]));
+        let info = optionNames[i];
+        let boolean = this.selected.includes(optionNames[i]);
+        if (boolean === true) {
+          switch (info) {
+            case "hospital":
+              this.eraseHospitalMarkers();
+              this.getHospitalMarkers();
+              break;
+            case "restaurant":
+              this.eraseRestaurantMarkers();
+              this.getRestaurantMarkers();
+              break;
+            case "school":
+              this.eraseSchoolMarkers();
+              this.getSchoolMarkers();
+              break;
+            case "mart":
+              this.eraseStoreMarkers();
+              this.getStoreMarkers();
+              break;
+            case "sub":
+              this.eraseSubMarkers();
+              this.getSubMarkers();
+              break;
+          }
+        } else {
+          switch (info) {
+            case "hospital":
+              this.eraseHospitalMarkers();
+              this.SET_HOSPITAL_INIT();
+              break;
+            case "restaurant":
+              this.eraseRestaurantMarkers();
+              this.SET_RESTAURANT_INIT();
+              break;
+            case "school":
+              this.eraseSchoolMarkers();
+              this.SET_SCHOOL_INIT();
+              break;
+            case "mart":
+              this.eraseStoreMarkers();
+              this.SET_STORE_INIT();
+              break;
+            case "sub":
+              this.eraseSubMarkers();
+              this.SET_SUB_INIT();
+              break;
+          }
+        }
+      }
+    },
+
     rangeDrag() {
       console.log(this.value);
     },
@@ -341,6 +398,7 @@ export default {
       let kakao = window.kakao;
       let hospitalInfo = this.getLocHospitalInfo;
 
+      if (hospitalInfo === null) return;
       this.hospitalMarker = [];
       for (var i = 0; i < hospitalInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
@@ -358,6 +416,7 @@ export default {
       let kakao = window.kakao;
       let restaurantInfo = this.getLocRestaurantInfo;
 
+      if (restaurantInfo === null) return;
       this.restaurantMarker = [];
       for (var i = 0; i < restaurantInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
@@ -375,6 +434,7 @@ export default {
       let kakao = window.kakao;
       let schoolInfo = this.getLocSchoolInfo;
 
+      if (schoolInfo === null) return;
       this.schoolMarker = [];
       for (var i = 0; i < schoolInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
@@ -392,6 +452,7 @@ export default {
       let kakao = window.kakao;
       let storeInfo = this.getLocStoreInfo;
 
+      if (storeInfo === null) return;
       this.storeMarker = [];
       for (var i = 0; i < storeInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
@@ -409,7 +470,9 @@ export default {
       let kakao = window.kakao;
       let subInfo = this.getLocSubInfo;
 
+      if (subInfo === null) return;
       this.subMarker = [];
+
       for (var i = 0; i < subInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
           imageOptions = {};
