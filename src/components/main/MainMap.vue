@@ -92,6 +92,7 @@ export default {
         console.log(mouseEvent.latLng.La);
         this.SET_INIT_LOCX(mouseEvent.latLng.Ma);
         this.SET_INIT_LOCY(mouseEvent.latLng.La);
+        this.$router.push("/about");
         // alert(mouseEvent.latLng instanceof kakao.maps.LatLng); // true
       });
     },
