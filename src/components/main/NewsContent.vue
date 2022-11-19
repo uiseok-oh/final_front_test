@@ -19,11 +19,9 @@
           :key="item.link"
         >
           <div style="width: 100%; height: 100%">
-            <img v-bind:src="newsList[index]" alt="" heignt="340px" />
-            <h1 style="color: black">{{ item.title }}</h1>
-            <p style="color: black">
-              {{ item.description }}
-            </p>
+            <img v-bind:src="newsList[index]" alt="" heignt="340px;" />
+            <h3 style="color: black" v-html="item.title"></h3>
+            <p style="color: black" v-html="item.description"></p>
           </div>
         </b-carousel-slide>
       </b-carousel>
