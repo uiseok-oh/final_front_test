@@ -68,10 +68,7 @@ export default {
     getNews() {
       var client_id = "EZqbIgXqDxLcyS9nWCrr";
       var client_secret = "EfMbqWVfRu";
-      var api_url =
-        `https://cors-anywhere.herokuapp.com/
-` +
-        `https://openapi.naver.com/v1/search/news.json?display=5&sort=date&query=%EC%95%84%ED%8C%8C%ED%8A%B8`;
+      var api_url = `/v1/search/news.json?display=5&sort=date&query=%EC%95%84%ED%8C%8C%ED%8A%B8`;
 
       var options = {
         headers: { "X-Naver-Client-Id": client_id, "X-Naver-Client-Secret": client_secret },

@@ -23,6 +23,7 @@
     <h1>=========================</h1>
     <h1>=========================</h1>
     <h1>=========================</h1>
+    <MainChatBot id="front"></MainChatBot>
   </div>
 </template>
 
@@ -33,8 +34,15 @@ import MainQnA from "@/components/main/MainQnA.vue";
 import MainBoard from "@/components/main/MainBoard.vue";
 import DealMap from "@/components/deal/DealMap.vue";
 import DealDetail from "@/components/deal/DealDetail.vue";
+import MainChatBot from "@/components/main/MainChatBot.vue";
 export default {
   name: "HomeView",
-  components: { MainMap, NewsContent, MainQnA, MainBoard, DealMap, DealDetail },
+  components: { MainChatBot, MainMap, NewsContent, MainQnA, MainBoard, DealMap, DealDetail },
 };
 </script>
+
+<style scoped>
+#front {
+  z-index: 1;
+}
+</style>

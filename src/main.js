@@ -6,6 +6,8 @@ import { BootstrapVue, IconsPlugin, BootstrapVueIcons } from "bootstrap-vue";
 // Import Bootstrap and BootstrapVue CSS files (order is important)
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
+import Chat from "vue-beautiful-chat";
+Vue.use(Chat);
 
 // Make BootstrapVue available throughout your project
 Vue.use(BootstrapVue);
