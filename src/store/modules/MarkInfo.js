@@ -38,31 +38,31 @@ const MarkInfo = {
   },
   mutations: {
     SET_HOSPITAL_INFO(state, info) {
-      state.hospitals = info;
+      state.hospitals = [].concat(state.hospitals, info);
     },
     SET_HOSPITAL_INIT(state) {
       state.hospitals = null;
     },
     SET_RESTAURANT_INFO(state, info) {
-      state.restaurants = info;
+      state.restaurants = [].concat(state.restaurants, info);
     },
     SET_RESTAURANT_INIT(state) {
       state.restaurants = null;
     },
     SET_SCHOOL_INFO(state, info) {
-      state.schools = info;
+      state.schools = [].concat(state.schools, info);
     },
     SET_SCHOOL_INIT(state) {
       state.schools = null;
     },
     SET_STORE_INFO(state, info) {
-      state.stores = info;
+      state.stores = [].concat(state.stores, info);
     },
     SET_STORE_INIT(state) {
       state.stores = null;
     },
     SET_SUB_INFO(state, info) {
-      state.subs = info;
+      state.subs = [].concat(state.subs, info);
     },
     SET_SUB_INIT(state) {
       state.subs = null;

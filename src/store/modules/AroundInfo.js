@@ -98,15 +98,15 @@ const AroundInfo = {
       let index = arr[1];
       let lat = arr[2];
       let lng = arr[3];
-      console.log(code);
-      console.log(index);
-      console.log(lat);
-      console.log(lng);
+      // console.log(code);
+      // console.log(index);
+      // console.log(lat);
+      // console.log(lng);
       places.categorySearch(
         code,
         (result, status) => {
           if (status === kakao.maps.services.Status.OK) {
-            console.log(result);
+            // console.log(result);
             commit("SET_HOUSE_INFO", [index, result]);
           }
         },

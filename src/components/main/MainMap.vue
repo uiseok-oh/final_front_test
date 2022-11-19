@@ -11,7 +11,8 @@
 <script>
 import $ from "jquery";
 import geojson from "./sig.json";
-import { mapGetters } from "vuex";
+import { mapGetters, mapMutations } from "vuex";
+const DealMapInit = "DealMapInit";
 
 export default {
   name: "MainMap",
@@ -34,7 +35,10 @@ export default {
       document.head.appendChild(script);
     }
   },
+
   methods: {
+    ...mapMutations(DealMapInit, ["SET_INIT_LOCX", "SET_INIT_LOCY"]),
+
     initMap() {
       const container = document.getElementById("map");
       const options = {
@@ -60,13 +64,14 @@ export default {
 
       // 다각형에 마우스오버 이벤트가 발생했을 때 변경할 채우기 옵션입니다
       let mouseoverOption = {
-        fillColor: "#EFFFED", // 채우기 색깔입니다
+        // fillColor: "#EFFFED", // 채우기 색깔입니다
+        fillColor: "#A2FF99", // 채우기 색깔입니다
         fillOpacity: 0.8, // 채우기 불투명도 입니다
       };
 
       let mouseoutOption = {
         fillColor: "#A2FF99", // 채우기 색깔입니다
-        fillOpacity: 0.7, // 채우기 불투명도 입니다
+        fillOpacity: 0.2, // 채우기 불투명도 입니다
       };
 
       // 다각형에 마우스오버 이벤트를 등록합니다
@@ -82,8 +87,12 @@ export default {
 
       // 다각형에 마우스다운 이벤트를 등록합니다
 
-      kakao.maps.event.addListener(polygon, "mousedown", function () {
-        console.log(polygon);
+      kakao.maps.event.addListener(polygon, "mousedown", (mouseEvent) => {
+        console.log(mouseEvent.latLng.Ma);
+        console.log(mouseEvent.latLng.La);
+        this.SET_INIT_LOCX(mouseEvent.latLng.Ma);
+        this.SET_INIT_LOCY(mouseEvent.latLng.La);
+        // alert(mouseEvent.latLng instanceof kakao.maps.LatLng); // true
       });
     },
 
@@ -118,7 +127,7 @@ export default {
         strokeOpacity: 0.8,
         strokeStyle: "longdash",
         fillColor: "#A2FF99",
-        fillOpacity: 0.7,
+        fillOpacity: 0.2,
       });
     },
 
@@ -129,9 +138,7 @@ export default {
         var coordinates2 = [];
 
         $.each(val2[0], function (index2, coordinate) {
-          coordinates2.push(
-            new kakao.maps.LatLng(coordinate[1], coordinate[0])
-          );
+          coordinates2.push(new kakao.maps.LatLng(coordinate[1], coordinate[0]));
         });
 
         polygonPath.push(coordinates2);

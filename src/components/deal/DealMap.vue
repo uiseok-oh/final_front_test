@@ -66,7 +66,9 @@ import storeImg from "@/assets/images/store.png";
 import subImage from "@/assets/images/subway.png";
 import { mapMutations, mapGetters } from "vuex";
 const MarkInfo = "MarkInfo";
+const DealMapInit = "DealMapInit";
 const optionNames = ["hospital", "restaurant", "school", "mart", "sub"];
+const maxPage = 5;
 
 function searchDetailAddrFromCoords(coords, callback) {
   let kakao = window.kakao;
@@ -89,8 +91,8 @@ export default {
       map: null, //mapInstance 저장값 가장 중요!!!
       selected: [],
       value: [0, 10000],
-      locX: 37.53386598076245, //초기값. 단 한 번 사용함. map 생성시에만
-      locY: 126.98038139595434, //초기값. 단 한 번 사용함. map 생성시에만
+      locX: 0, //초기값. 단 한 번 사용함. map 생성시에만
+      locY: 0, //초기값. 단 한 번 사용함. map 생성시에만
       hospitalMarker: [],
       restaurantMarker: [],
       schoolMarker: [],
@@ -114,10 +116,15 @@ export default {
       "getLocCurLocX",
       "getLocCurLocY",
     ]),
+    ...mapGetters(DealMapInit, ["getInitLocX", "getInitLocY"]),
+  },
+  created() {
+    this.locX = this.getInitLocX;
+    this.locY = this.getInitLocY;
   },
   mounted() {
     let kakao = window.kakao;
-    console.log(this.$refs.map); //should be not null
+    // console.log(this.$refs.map); //should be not null
     let mapContainer = this.$refs.map;
     let startX = this.locX;
     let startY = this.locY;
@@ -128,7 +135,7 @@ export default {
     };
 
     const mapInstance = new kakao.maps.Map(mapContainer, mapOption);
-    console.log(mapInstance);
+    // console.log(mapInstance);
     this.map = mapInstance;
 
     kakao.maps.event.addListener(mapInstance, "rightclick", (mouseEvent) => {
@@ -153,14 +160,14 @@ export default {
 
     kakao.maps.event.addListener(mapInstance, "dragend", () => {
       let latlng = mapInstance.getCenter();
-      let message = "변경된 지도 중심좌표는 " + latlng.getLat() + " 이고, ";
-      message += "경도는 " + latlng.getLng() + " 입니다";
+      // let message = "변경된 지도 중심좌표는 " + latlng.getLat() + " 이고, ";
+      // message += "경도는 " + latlng.getLng() + " 입니다";
       this.SET_CUR_LOCX(latlng.getLat());
       this.SET_CUR_LOCY(latlng.getLng());
       this.tabView = false;
       this.modalView = false;
       this.searchView = false;
-      console.log(message);
+      // console.log(message);
       this.allOptionCheck();
     });
   },
@@ -185,8 +192,8 @@ export default {
     ///////////////////////다양한 옵션 설정///////////////////////
     allOptionCheck() {
       for (let i = 0; i < optionNames.length; i++) {
-        console.log(optionNames[i]);
-        console.log(this.selected.includes(optionNames[i]));
+        // console.log(optionNames[i]);
+        // console.log(this.selected.includes(optionNames[i]));
         let info = optionNames[i];
         let boolean = this.selected.includes(optionNames[i]);
         if (boolean === true) {
@@ -240,7 +247,7 @@ export default {
     },
 
     rangeDrag() {
-      console.log(this.value);
+      // console.log(this.value);
     },
     setMapUpdate(evt) {
       let boolean = !this.selected.includes(evt.target.value);
@@ -302,7 +309,7 @@ export default {
       const mapInstance = this.map;
 
       let ps = new window.kakao.maps.services.Places(mapInstance);
-
+      this.hospitalMarker = [];
       const placesSearchCB = (data, status) => {
         if (status === kakao.maps.services.Status.OK) {
           let tmp = [];
@@ -314,14 +321,15 @@ export default {
         //마커생성관련 만들기
         this.createHospitalMarkers();
       };
-      ps.categorySearch("HP8", placesSearchCB, { useMapBounds: true });
+      for (let i = 1; i <= maxPage; i++)
+        ps.categorySearch("HP8", placesSearchCB, { useMapBounds: true, page: i });
     },
     getRestaurantMarkers() {
       let kakao = window.kakao;
       const mapInstance = this.map;
 
       let ps = new window.kakao.maps.services.Places(mapInstance);
-
+      this.restaurantMarker = [];
       const placesSearchCB = (data, status) => {
         if (status === kakao.maps.services.Status.OK) {
           let tmp = [];
@@ -333,14 +341,16 @@ export default {
         //마커생성관련 만들기
         this.createRestaurantMarkers();
       };
-      ps.categorySearch("FD6", placesSearchCB, { useMapBounds: true });
+
+      for (let i = 1; i <= maxPage; i++)
+        ps.categorySearch("FD6", placesSearchCB, { useMapBounds: true, page: i });
     },
     getSchoolMarkers() {
       let kakao = window.kakao;
       const mapInstance = this.map;
 
       let ps = new window.kakao.maps.services.Places(mapInstance);
-
+      this.schoolMarker = [];
       const placesSearchCB = (data, status) => {
         if (status === kakao.maps.services.Status.OK) {
           let tmp = [];
@@ -352,14 +362,16 @@ export default {
         //마커생성관련 만들기
         this.createSchoolMarkers();
       };
-      ps.categorySearch("SC4", placesSearchCB, { useMapBounds: true });
+
+      for (let i = 1; i <= maxPage; i++)
+        ps.categorySearch("SC4", placesSearchCB, { useMapBounds: true, page: i });
     },
     getStoreMarkers() {
       let kakao = window.kakao;
       const mapInstance = this.map;
 
       let ps = new window.kakao.maps.services.Places(mapInstance);
-
+      this.storeMarker = [];
       const placesSearchCB = (data, status) => {
         if (status === kakao.maps.services.Status.OK) {
           let tmp = [];
@@ -371,14 +383,16 @@ export default {
         //마커생성관련 만들기
         this.createStoreMarkers();
       };
-      ps.categorySearch("CS2", placesSearchCB, { useMapBounds: true });
+
+      for (let i = 1; i <= maxPage; i++)
+        ps.categorySearch("CS2", placesSearchCB, { useMapBounds: true, page: i });
     },
     getSubMarkers() {
       let kakao = window.kakao;
       const mapInstance = this.map;
 
       let ps = new window.kakao.maps.services.Places(mapInstance);
-
+      this.subMarker = [];
       const placesSearchCB = (data, status) => {
         if (status === kakao.maps.services.Status.OK) {
           let tmp = [];
@@ -390,7 +404,9 @@ export default {
         //마커생성관련 만들기
         this.createSubMarkers();
       };
-      ps.categorySearch("SW8", placesSearchCB, { useMapBounds: true });
+
+      for (let i = 1; i <= maxPage; i++)
+        ps.categorySearch("SW8", placesSearchCB, { useMapBounds: true, page: i });
     },
     /////////////////////마커 생성
     createHospitalMarkers() {
@@ -399,7 +415,7 @@ export default {
       let hospitalInfo = this.getLocHospitalInfo;
 
       if (hospitalInfo === null) return;
-      this.hospitalMarker = [];
+
       for (var i = 0; i < hospitalInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
           imageOptions = {};
@@ -417,7 +433,7 @@ export default {
       let restaurantInfo = this.getLocRestaurantInfo;
 
       if (restaurantInfo === null) return;
-      this.restaurantMarker = [];
+
       for (var i = 0; i < restaurantInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
           imageOptions = {};
@@ -435,7 +451,7 @@ export default {
       let schoolInfo = this.getLocSchoolInfo;
 
       if (schoolInfo === null) return;
-      this.schoolMarker = [];
+
       for (var i = 0; i < schoolInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
           imageOptions = {};
@@ -453,7 +469,7 @@ export default {
       let storeInfo = this.getLocStoreInfo;
 
       if (storeInfo === null) return;
-      this.storeMarker = [];
+
       for (var i = 0; i < storeInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
           imageOptions = {};
@@ -471,7 +487,6 @@ export default {
       let subInfo = this.getLocSubInfo;
 
       if (subInfo === null) return;
-      this.subMarker = [];
 
       for (var i = 0; i < subInfo.length; i++) {
         let imageSize = new kakao.maps.Size(44, 44),
@@ -543,7 +558,7 @@ export default {
       let kakao = window.kakao;
       searchDetailAddrFromCoords(latLng, (result, status) => {
         if (status === kakao.maps.services.Status.OK) {
-          console.log(result[0]);
+          // console.log(result[0]);
           this.rightLoc.city = result[0].address.region_1depth_name;
           this.rightLoc.gu = result[0].address.region_2depth_name;
         }
@@ -557,8 +572,8 @@ export default {
     },
     setMarkClickEvent(marker) {
       let kakao = window.kakao;
-      kakao.maps.event.addListener(marker, "click", (evt) => {
-        console.log(evt);
+      kakao.maps.event.addListener(marker, "click", () => {
+        // console.log(evt);
         this.modalView = true;
       });
     },
@@ -569,22 +584,33 @@ export default {
       this.SET_CUR_LOCY(y);
       this.map.panTo(moveLatLon);
     },
-    searchFunc(event) {
+    searchFunc() {
       let kakao = window.kakao;
       this.searchView = true;
-      console.log(event);
+      // console.log(event);
       let ps = new kakao.maps.services.Places();
       ps.keywordSearch(this.keyword, (places, status) => {
         if (status === kakao.maps.services.Status.OK) {
           this.searchList = places;
-          console.log(places);
+          // console.log(places);
         }
       });
     },
     moveMap(e) {
-      console.log(e.x);
-      console.log(e.y);
       this.moveCenter(e.y, e.x);
+      // console.log(e.x);
+      // console.log(e.y);
+      let kakao = window.kakao;
+      let markerImageSrc = require("@/assets/images/arrow.png");
+      let imageSize = new kakao.maps.Size(44, 44);
+
+      let markerImage = this.createMarkerImage(markerImageSrc, imageSize, {});
+      let marker = this.createMarker(new kakao.maps.LatLng(e.y, e.x), markerImage);
+
+      marker.setMap(this.map);
+      setTimeout(() => marker.setMap(null), 400);
+      setTimeout(() => marker.setMap(this.map), 800);
+      setTimeout(() => marker.setMap(null), 1200);
     },
   },
 };
